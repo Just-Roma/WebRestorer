@@ -1,17 +1,22 @@
 /*
- * Defines user-chosen regexes for hosts.
+ * Defines user-chosen static/regexes for hosts.
  *
  *----------------------------------------*
      Sites, which will not be modified
  *----------------------------------------*
 */
-const IGNORED_SITES = [
+const STATIC_IGNORED_SITES = [
     'https://www.youtube.com',
+    'https://www.google.com',
+    'https://github.com',
+];
+
+const RGX_IGNORED_SITES = [
 ];
 /*
  *----------------------------------------*
      Sites, which need special handling
  *----------------------------------------*
 */
-const SPECIAL_SITES = [
+const STATIC_SPECIAL_SITES = [
 ];

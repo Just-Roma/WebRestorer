@@ -226,6 +226,18 @@ function examine_dom(root_element){
   recurse_dom(root_element);
 }
 
+function is_site_ignored(host){
+  if (STATIC_IGNORED_SITES.includes(host)) return true;
+  for (const rgx of RGX_IGNORED_SITES){
+    if (host.match(rgx)) return true;
+  }
+  return false;
+}
+
+function is_site_special(host){
+  if (STATIC_SPECIAL_SITES.includes(host)) return true;
+  return false;
+}
 
 /********************   Main   *********************/
 
@@ -234,12 +246,12 @@ chrome.runtime.onMessage.addListener((data, sender) => {
   */
   const mode = data.message.mode;
   if (mode === 'enabled'){
-    if (IGNORED_SITES.includes(origin)){
+    if (is_site_ignored(origin)){
       // Skip, we dont want to modify such sites.
     }
     else {
       // Handle special sites in some specific way.
-      if (origin in SPECIAL_SITES){
+      if (is_site_special(origin)){
         handle_special_sites(origin);
       }
       // Otherwise handle general-type sites according to some common pattern.
