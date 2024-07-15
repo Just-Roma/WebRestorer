@@ -79,6 +79,20 @@ const special_elements = {
   /*
   Holder for different groups of HTML elements.
   */
+  generally_excluded: [
+    /*
+    Elements, which cant be or extremely unlikely to be a part of any element-based annoyance.
+    */
+    'ABBR', 'ACRONYM', 'ADDRESS', 'AREA', 'AUDIO', 'B', 'BDI', 'BDO', 'BIG', 'BLOCKQUOTE', 'BR', 'CAPTION',
+    'CENTER', 'CITE', 'CODE', 'COL', 'COLGROUP', 'DATA', 'DATALIST', 'DD', 'DEL', 'DETAILS', 'DFN', 'DL',
+    'DT', 'EM', 'FIELDSET', 'FIGCAPTION', 'FIGURE', 'FONT', 'FORM', 'HEAD', 'HR', 'I', 'IMG', 'INPUT', 'INS',
+    'KBD', 'LABEL', 'LEGEND', 'LI', 'LINK', 'MAP', 'MARK', 'MARQUEE', 'MENU', 'MENUITEM', 'META', 'METER',
+    'NOBR', 'NOSCRIPT', 'OL', 'OPTGROUP', 'OPTION', 'OUTPUT', 'P', 'PARAM', 'PICTURE', 'PLAINTEXT', 'PRE',
+    'PROGRESS', 'Q', 'RB', 'RP', 'RT', 'RTC', 'RUBY', 'S', 'SAMP', 'SCRIPT', 'SEARCH', 'SELECT', 'SMALL',
+    'SOURCE', 'STRIKE', 'STRONG', 'STYLE', 'SUB', 'SUMMARY', 'SUP', 'TABLE', 'TBODY', 'TD', 'TEXTAREA',
+    'TFOOT', 'TH', 'THEAD', 'TIME', 'TITLE', 'TR', 'TRACK', 'TT', 'U', 'UL', 'VAR', 'VIDEO', 'WBR', 'XMP',
+  ],
+
   excluded_for_transparency: [
     /*
     For some elements transparency can be a part of design, it would be nice to preserve it.
@@ -179,7 +193,7 @@ const css_properties_handlers = {
       support_for_css_properties_handlers.has_non_special_ancestors(element) &&
       support_for_css_properties_handlers.has_non_special_descendants(element)
     ){
-      remove_element(element); return 'removed';
+      support.remove_element(element); return 'removed';
     }
   },
 };
@@ -214,7 +228,7 @@ const support_for_css_properties_handlers = {
 
     function recurse_dom(element){
       for (const _element of element.children){
-        if (!excluded_elements.includes(_element.tagName)){
+        if (!special_elements.generally_excluded.includes(_element.tagName)){
           if (special_elements.descendants_for_z_index.includes(_element.tagName)) output = false;
           if (output) recurse_dom(_element);
         }
@@ -224,7 +238,7 @@ const support_for_css_properties_handlers = {
         const shadow = element.shadowRoot;
         if (shadow){
           for (const _element of shadow.children){
-            if (!excluded_elements.includes(_element.tagName)){
+            if (!special_elements.generally_excluded.includes(_element.tagName)){
               if (special_elements.descendants_for_z_index.includes(_element.tagName)) output = false;
               if (output) recurse_dom(_element);
             }
@@ -239,11 +253,16 @@ const support_for_css_properties_handlers = {
   }
 };
 
+const support = {
+  /*
+  General support functionality.
+  */
+  remove_element: function (element){
+    // Safe removal of element.
+    if (body.contains(element)) element.remove();
+  }
+};
 
-function remove_element(element){
-  // Safe removal of element.
-  if (body.contains(element)) element.remove();
-}
 
 /*
  *------------------------------------*
@@ -255,22 +274,10 @@ function handle_special_sites(origin){
   */
 }
 
-// Elements, which cant be or extremely unlikely to be a part of any element-based annoyance.
-const excluded_elements = [
-  'ABBR', 'ACRONYM', 'ADDRESS', 'AREA', 'AUDIO', 'B', 'BDI', 'BDO', 'BIG', 'BLOCKQUOTE', 'BR', 'CAPTION',
-  'CENTER', 'CITE', 'CODE', 'COL', 'COLGROUP', 'DATA', 'DATALIST', 'DD', 'DEL', 'DETAILS', 'DFN', 'DL',
-  'DT', 'EM', 'FIELDSET', 'FIGCAPTION', 'FIGURE', 'FONT', 'FORM', 'HEAD', 'HR', 'I', 'IMG', 'INPUT', 'INS',
-  'KBD', 'LABEL', 'LEGEND', 'LI', 'LINK', 'MAP', 'MARK', 'MARQUEE', 'MENU', 'MENUITEM', 'META', 'METER',
-  'NOBR', 'NOSCRIPT', 'OL', 'OPTGROUP', 'OPTION', 'OUTPUT', 'P', 'PARAM', 'PICTURE', 'PLAINTEXT', 'PRE',
-  'PROGRESS', 'Q', 'RB', 'RP', 'RT', 'RTC', 'RUBY', 'S', 'SAMP', 'SCRIPT', 'SEARCH', 'SELECT', 'SMALL',
-  'SOURCE', 'STRIKE', 'STRONG', 'STYLE', 'SUB', 'SUMMARY', 'SUP', 'TABLE', 'TBODY', 'TD', 'TEXTAREA',
-  'TFOOT', 'TH', 'THEAD', 'TIME', 'TITLE', 'TR', 'TRACK', 'TT', 'U', 'UL', 'VAR', 'VIDEO', 'WBR', 'XMP',
-];
-
 function examine_and_handle_element(element){
 
   // Not an HTML element or excluded.
-  if (!(element instanceof HTMLElement) || excluded_elements.includes(element.tagName)) return;
+  if (!(element instanceof HTMLElement) || special_elements.generally_excluded.includes(element.tagName)) return;
 
   const style = getComputedStyle(element);
 
@@ -284,7 +291,7 @@ function examine_dom(root_element){
   */
   function recurse_dom(element){
     for (const _element of element.children){
-      if (!excluded_elements.includes(_element.tagName)){
+      if (!special_elements.generally_excluded.includes(_element.tagName)){
         let result = examine_and_handle_element(_element);
         if (result != 'removed'){
           recurse_dom(_element);
@@ -295,7 +302,7 @@ function examine_dom(root_element){
     const shadow = element.shadowRoot;
     if (shadow){
       for (const _element of shadow.children){
-        if (!excluded_elements.includes(_element.tagName)){
+        if (!special_elements.generally_excluded.includes(_element.tagName)){
           let result = examine_and_handle_element(_element);
           if (result != 'removed'){
             recurse_dom(_element);
@@ -313,7 +320,7 @@ function is_site_ignored(host){
   Check if the given host must be ignored as defined in the consts/sites.js
   */
   if (STATIC_IGNORED_SITES.includes(host)) return true;
-  for (const rgx of RGX_IGNORED_SITES) if (host.match(rgx)) return true;
+  for (const rgx of RGX_IGNORED_SITES){ if (host.match(rgx)) return true; }
   return false;
 }
 
