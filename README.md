@@ -1,5 +1,8 @@
 # WebRestorer
-Restores webpages to a readable state by removing different annoyances.
+Restores webpages to a readable state by removing different annoyances.  
+
+The only intention of this extension is to speed up the reading of web content. It is not some general solution to removal of all popups. 
+It can improve your surfing experience but can also break complex web apps (eg Github). To solve this break-problem, either disable the extension or update the `consts/sites.js` file.
 # Installation
 1. Download ZIP.
 2. Unzip the file in some folder.
